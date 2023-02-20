@@ -9,26 +9,20 @@ from pathlib import Path
 #### Important inputs
 CFfilename = "*.json"
 originalLocation = "original"
+outputDirectory = ""
 tilesheetLocation = "Mods"
 dgaTilesheetName = "dga_furniture_tilesheet.png"
 frontTilesheetName = "dga_front_tilesheet.png"
 
 # TODO: Handle default sitting for armchairs, benches, couches
 
-def main(CFfilename, originalLocation, tilesheetLocation):
-	# Create the parser
-	parser = argparse.ArgumentParser()
-	# Add an argument
-	parser.add_argument('--modName', type=str, required=True, help="Name of the mod (no spaces), should be identifying")
-	parser.add_argument('--modAuthor', type=str, required=False, help="Author of the original mod (no spaces)")
-	parser.add_argument('--sellAt', type=str, required=False, help="Name of shop to sell furniture at. Options are found at https://github.com/spacechase0/StardewValleyMods/blob/develop/DynamicGameAssets/docs/author-guide.md#valid-shop-ids-for-vanilla")
-	# Parse the argument
-	args = parser.parse_args()
-
+def main(modName, modAuthor, originalDirectory, output, sellAt):
 	# Set information based on inputs
-	modName = args.modName
-	shouldSell = True if args.sellAt is not None else False
-	shopName = None if args.sellAt is None else check_shop_name(args.sellAt)
+	modName = modName
+	shouldSell = True if sellAt is not None else False
+	shopName = None if sellAt is None else check_shop_name(sellAt)
+	originalLocation = originalDirectory
+	outputDirectory = output
 
 	## Load up the furniture json!
 	folderPath = Path(originalLocation)
@@ -56,7 +50,7 @@ def main(CFfilename, originalLocation, tilesheetLocation):
 		furniture_data.extend(data["furniture"])
 
 	# Gather useful data out of the manifest
-	modAuthor = args.modAuthor if args.modAuthor is not None else manifest["Author"]
+	modAuthor = modAuthor if modAuthor is not None else manifest["Author"]
 	# Strip out spaces and punctuation and such from mod author and mod name
 	modAuthor = re.sub(r'[^A-Za-z0-9_\.-]+', '', modAuthor)
 	modName = re.sub(r'[^A-Za-z0-9_\.-]+', '', modName)
@@ -327,7 +321,7 @@ def main(CFfilename, originalLocation, tilesheetLocation):
 	}
 
 	## Save all the DGA json files in an appropriately named folder
-	dga_folder_path = Path("[DGA] " + manifest["Name"])
+	dga_folder_path = Path(outputDirectory + "/[DGA] " + manifest["Name"])
 	dga_i18n_path = dga_folder_path.joinpath("i18n")
 	save_json(dga_data, dga_folder_path, "furniture.json")
 	save_json(dga_content_data, dga_folder_path, "content.json")
@@ -337,7 +331,7 @@ def main(CFfilename, originalLocation, tilesheetLocation):
 		save_json(dga_shop_entries, dga_folder_path, "shopEntries.json")
 
 	## Save all of the CP json files in an appropriately named folder
-	cp_folder_path = Path("[CP] FOR ALPHA ONLY " + manifest["Name"])
+	cp_folder_path = Path(outputDirectory + "/[CP] FOR ALPHA ONLY " + manifest["Name"])
 	cp_i18n_path = cp_folder_path.joinpath("i18n")
 	save_json(actual_cp_data, cp_folder_path,"content.json")
 	save_json(cp_manifest,cp_folder_path,"manifest.json")
@@ -350,7 +344,7 @@ def main(CFfilename, originalLocation, tilesheetLocation):
 		frontTilesheet = frontTilesheet.crop((0,0,tilesheetWidth*16,tilesheetHeight*16))
 		frontTilesheet.save(dga_folder_path.joinpath(frontTilesheetName))
 	if animatedImages:
-		dga_anim_path = dga_folder_path.joinpath("animated")
+		dga_anim_path = dga_folder_path.joinpath(outputDirectory + "/animated")
 		dga_anim_path.mkdir(exist_ok=True)
 		for imName, im in animatedImages.items():
 			im.save(dga_anim_path.joinpath(imName + ".png"))
@@ -664,7 +658,7 @@ def get_image_location(takenTiles, imW, imH, tilesheetWidth, tilesheetHeight):
 	return imageLoc, imageTileInd
 
 # Call the main() function to actually do things
-main(CFfilename, originalLocation, tilesheetLocation)
+# main(CFfilename, originalLocation, tilesheetLocation)
 
 ## Some fun facts for reference
 dgaFurnitureTypes = ["Bed", "Decoration", "Dresser", "Fireplace", "FishTank", "Lamp", "Painting", "Rug",
