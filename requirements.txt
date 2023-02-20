@@ -2,3 +2,4 @@ json5
 Pillow
 argparse
 PyQt6
+pyqtdarktheme
