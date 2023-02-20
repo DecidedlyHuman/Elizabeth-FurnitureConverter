@@ -1,4 +1,4 @@
 json5
 Pillow
 argparse
-pathlib
+PyQt6
