@@ -4,7 +4,7 @@ import furniture_converter
 
 from PyQt6.QtWidgets import (
     QApplication, QLabel, QWidget, QVBoxLayout,
-    QHBoxLayout, QLineEdit, QPushButton, QSizePolicy)
+    QHBoxLayout, QLineEdit, QPushButton)
 
 def go_button_clicked():
     furniture_converter.main(modNameLineEdit.text(), authorLineEdit.text(),
